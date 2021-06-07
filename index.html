@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="user-scable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, width=device-width, target-densitydpi=medium-dpi">
+<meta name="format-detection" content="telephone=yes, address=no, email=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title> aria 동적요소 라이브러리 </title>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+        }
+        ul{
+            padding: 0;
+        }
+        #content{
+           width: 100%;
+            height: 100%;
+/*            padding: 15px;*/
+            border:20px solid transparent;
+            box-sizing:border-box;
+/*
+            -webkit-box-shadow: inset 0px 0px 0px 5px #f00;
+            box-shadow: inset 0px 0px 0px 5px #f00; 
+            -moz-box-sizing:border-box;
+*/
+        }
+        
+         .info{
+            border: solid 1px #9C9C9C;
+            padding: 10px;
+            width: 100%;
+            box-sizing:border-box;
+        }
+        
+        li{
+            list-style: none;
+        }
+        div.skip{
+            display: none;
+        }
+        input[type=checkbox], input[type=radio]{
+            display: none;
+        }
+        label{
+           position: relative;
+           padding-left: 16px;
+        }
+
+         label:before {
+            content :"";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border: solid 1px #9C9C9C;
+
+            position: absolute;
+            top: 1px;
+            left: 0px;
+        }
+
+        .radio label:before {
+            content :"";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border: solid 1px #9C9C9C;
+             border-radius: 50%;
+            -moz-border-radius:50%;
+            -webkit-border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 0px;
+        }
+
+        label:after {
+            content:"";
+            width: 8px;
+            height: 8px;
+            background-color: #666666;
+            position: absolute;
+            left: 2px;
+            top: 3px;
+            display: none;
+        }
+
+        .radio label:after {
+            content:"";
+            width: 8px;
+            height: 8px;
+            background-color: #666666;
+            border-radius: 50%;
+            -moz-border-radius:50%;
+            -webkit-border-radius: 50%;
+            position: absolute;
+            left: 2px;
+            top: 3px;
+            display: none;
+        }
+
+        input[type=checkbox]:checked + label::after ,input[type=radio]:checked + label::after {
+           display: block;
+        }
+
+        .accordion .detail{
+            display: none;
+        }
+
+        .accordion>li.on , .accordion>li.on>.detail
+        {
+            display: block;
+
+        }
+
+        .tabMenu{
+            width:100%;
+            height: 30px;
+            margin: 0;
+            padding: 0;
+        }
+        .tabMenu>li{
+            float: left;
+            padding-right: 10px;
+        }
+
+        .tabCon{
+            border: solid 1px;
+            width: 100px;
+            height: 100px;
+            padding: 10px;
+            display: none;
+        }
+
+
+
+
+        
+        em{
+            font-style: normal;
+            color: chocolate;
+        }
+        
+        .dim{
+            position:fixed;
+            left: 0;
+            top:0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            opacity: .7;
+        }
+        
+        .popup-js{
+            display: none;
+        }
+        
+        .layerBox
+        {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 50%;
+            top:0;
+            margin-left: -50%;
+        }
+        
+
+        .layerPop
+        {
+            position: relative;
+            background: #ffffff;
+            margin: 15px 15px 15px 15px;
+            border:  solid 1px #9C9C9C;
+/*            z-index: 100;*/
+        }
+        
+        .layerPop .popTit{
+            position        :   relative;
+            padding-top     :10px;
+            padding-bottom  : 0px;
+        }
+        
+        .layerPop .popTit::after{
+            content:'';
+            display:inline-block;
+            width:100%; 
+            height:100%;
+            border-bottom:1px solid #9C9C9C;
+        }
+        
+        .layerPop .popTit strong
+        {
+            font-size: 1.5em;
+            padding-left: 10px;
+        }
+        
+        
+        .layerPop .popTit .close{
+            position: absolute;
+            right: 0;
+            top:50%;
+            margin-top: -20px;
+            padding-right: 10px;
+        }
+        
+        .layerPop .popCon{
+            padding: 10px;
+            background: #ffffff;
+        }
+/*
+        .dim{
+            display: none;
+        }
+*/
+        
+    </style>    
+    <script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="ariaLibs.js"></script>
+    <script>
+        
+        $(function(){
+            $('a').on('click',function(e){
+                e.preventDefault();
+            });
+        })
+        
+        function test()
+        {
+            
+            console.log('11111');
+            
+        }
+        
+    </script>
+</head>
+    <body>
+        <div class="skip">
+            <a href="#content">본문 바로가기</a>
+        </div>
+
+        <div id='content'>
+            <div>
+                <div class="info">
+                    추가적인 작업은 필요 없으며 <em>ariaLib.js</em>를
+                    로드하면 체크 박스 , 라디오는 aria 태그추가
+                    아코디언 , 탭 메뉴는 지정한 클래스를
+                    지정해 주시면 작동하게 됩니다.
+                </div>
+
+                <h2> 체크박스 </h2>
+                <ul>
+                    <li>
+                        <span>
+                            <input type='checkbox' id='chk1'/>
+                            <label for="chk1">체크박스1</label>
+                        </span>    
+                    </li>
+                    <li>
+                        <span>
+                            <input type='checkbox' id='chk2'/>
+                            <label for="chk2">체크박스2</label>
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <input type='checkbox' id='chk3'/>
+                            <label for="chk3">체크박스3</label>
+                        </span>
+                    </li>
+                </ul>
+                <div class="info">
+                    <em>ariaLibs.js</em> 추가
+                </div>
+            </div>
+            <div>
+                <h2>라디오</h2>
+                <ul class="radio">
+                    <li>
+                        <span>
+                            <input type='radio' id='rad1' name='radio1'/>
+                            <label for="rad1">라디오1</label>
+                        </span>    
+                    </li>
+                    <li>
+                        <span>
+                            <input type='radio' id='rad2' name='radio1'/>
+                            <label for="rad2">라디오2</label>
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            <input type='radio' id='rad3' name='radio1'/>
+                            <label for="rad3">라디오3</label>
+                        </span>
+                    </li>
+                </ul>
+                <div class="info">
+                    <em>ariaLibs.js</em> 추가
+                </div>
+            </div>
+            <div>
+                <h2>아코디언</h2>
+                <ul class="accordion accordion-js one-type-js">
+                    <li>
+                        <a href="#">리스트1</a>
+                        <div class="detail detail-js">
+                            내용1<br>
+                            내용1<br>
+                            내용1<br>
+                            내용1
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#">리스트2</a>
+                        <div class="detail detail-js">
+                            내용2<br>
+                            내용2<br>
+                            내용2<br>
+                            내용2
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#">리스트3</a>
+                        <div class="detail detail-js">
+                            내용3<br>
+                            내용3<br>
+                            내용3<br>
+                            내용3
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#">리스트4</a>
+                        <div class="detail detail-js">
+                            내용4<br>
+                            내용4<br>
+                            내용4<br>
+                            내용4
+                        </div>
+                    </li>
+                </ul>
+                <div class="info">
+                    <em>accordion-js</em> 클래스 추가 리스트에 제목은 &lt;a&gt; 태그에 추가
+                    세부내용은 <em>detail-js</em>클래스 추가 및 열리는 경우는 
+                    <em>on</em> 클래스를 추가하도록 되어 있습니다.
+                </div>
+            </div>   
+            <div>
+                <h2>탭 메뉴</h2>
+                <ul class="tabMenu tab-js">
+                    <li>
+                        <a href="#tab1">탭1</a>
+                    </li>
+                    <li>
+                        <a href="#tab2">탭2</a>
+                    </li>
+                    <li>
+                        <a href="#tab3">탭3</a>
+                    </li>
+                    <li>
+                        <a href="#tab4">탭4</a>
+                    </li>
+                </ul>
+                <div class="tabCon" id="tab1" style="display:block">탭1 내용</div>
+                <div class="tabCon" id="tab2">탭2 내용</div>
+                <div class="tabCon" id="tab3">탭3 내용</div>
+                <div class="tabCon" id="tab4">탭4 내용</div>
+
+                <div class="info" style='margin-top:20px;'>
+                    <em>tab-js</em> 클래스 추가
+                    리스트에 제목은 &lt;a href="<em>#content id</em>"&gt; 아이디 지정
+                    탭 콘텐츠에 아이디값을 찾아서 none , block 처리가 이루어집니다.
+                </div>
+            </div>
+            <div>
+                <h2>레이어 팝업</h2>
+                <!--- -->
+                <a href="#" onclick="javascript:mvCommon.aria.popOpen({layerBox:'.layerBox',popup:'.layerPop',close:'.close>button'});">팝업열기</a>
+                
+                <div class="info" style='margin-top:20px;'>
+                    <em>tab-js</em> 클래스 추가
+                    리스트에 제목은 &lt;a href="<em>#content id</em>"&gt; 아이디 지정
+                    탭 콘텐츠에 아이디값을 찾아서 none , block 처리가 이루어집니다.
+                </div>
+            </div>
+        </div>
+        <div class='layerBox popup-js'>
+            <div class='dim'> </div>
+            <div class='layerPop '>
+                <div class='popTit'>
+                    <strong>팝업창</strong>
+                    <div class='close'><button type="button">닫기</button></div>
+                </div>
+                <div class="popCon">
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                    팝업창<br>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
